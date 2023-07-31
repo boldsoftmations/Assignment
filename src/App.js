@@ -1,23 +1,44 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
+import "./App.css";
+import { Header } from "./components/Headers/Header";
+import axios from "axios";
+import DrugList from "./components/List/DrugList";
+import Footer from "./components/Footers/Footer";
+import SubFooter from "./components/Footers/SubFooter";
+
 
 function App() {
+  const [drugData, setDrugData] = useState([]);
+
+  useEffect(() => {
+    // Function to fetch data from the API
+    const fetchDrugData = async () => {
+      try {
+        const response = await axios.post("http://devapi.hidoc.co:8080/hidoc-us/drug/getDrugList");
+
+        // You can check response status if needed
+        if (response.status !== 200) {
+          throw new Error("Failed to fetch data from the API");
+        }
+
+        const data = response.data.data;
+
+        // Set drug data
+        setDrugData(data.drugData);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    // Call the API function
+    fetchDrugData();
+  }, []);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="appcontainer">
+      <Header />
+      <DrugList drugData={drugData}/>
+      <SubFooter />
+      <Footer />
     </div>
   );
 }
